@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
     'corsheaders',
-    'authentication',
+    'authentication',  # Must be before devices to load schema extensions
     'devices',
 ]
 
@@ -137,3 +138,96 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
 AUTH_USER_MODEL = 'authentication.User'
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'authentication.middleware.FirebaseAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# API Documentation (drf-spectacular)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Omny API',
+    'DESCRIPTION': 'API for Omny - Care Circle Management System with IoT Device Integration',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    
+    # Security schemes
+    'SECURITY': [{'BearerAuth': []}],
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'BearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'Firebase ID Token',
+                'description': 'Firebase ID token obtained from Firebase Authentication. Include as: Authorization: Bearer <token>'
+            }
+        }
+    },
+    
+    # Swagger UI settings
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'filter': True,
+    },
+    
+    # Schema customization
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    'SCHEMA_PATH_PREFIX_TRIM': True,
+    'SERVERS': [
+        {'url': 'http://localhost:8000', 'description': 'Development server'},
+    ],
+    
+    # Tags
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'Firebase authentication endpoints'},
+        {'name': 'Devices', 'description': 'Device registration and management'},
+        {'name': 'Alerts', 'description': 'Device alert management'},
+        {'name': 'Emergencies', 'description': 'Emergency event management'},
+    ],
+    
+    # Postprocessing hooks
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+    ],
+}
+
+# Firebase Configuration
+# Set your Firebase credentials path as an environment variable
+# export FIREBASE_CREDENTIALS_PATH="/path/to/serviceAccountKey.json"
+import os
+
+FIREBASE_CREDENTIALS_PATH = os.environ.get('FIREBASE_CREDENTIALS_PATH', '')
+
+# Initialize Firebase Admin SDK
+if FIREBASE_CREDENTIALS_PATH and os.path.exists(FIREBASE_CREDENTIALS_PATH):
+    import firebase_admin
+    from firebase_admin import credentials
+    
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+        firebase_admin.initialize_app(cred)
+else:
+    # For development, you can also initialize without credentials
+    # This will use Application Default Credentials
+    import firebase_admin
+    if not firebase_admin._apps:
+        try:
+            firebase_admin.initialize_app()
+        except Exception as e:
+            print(f"Warning: Firebase initialization failed: {e}")
+            print("Please set FIREBASE_CREDENTIALS_PATH environment variable")

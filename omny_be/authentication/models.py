@@ -24,8 +24,8 @@ class Household(models.Model):
     
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Care Circle'
-        verbose_name_plural = 'Care Circles'
+        verbose_name = 'Household'
+        verbose_name_plural = 'Households'
     
     def __str__(self):
         return self.name
