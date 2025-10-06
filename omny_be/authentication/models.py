@@ -166,3 +166,48 @@ class User(AbstractBaseUser, PermissionsMixin):
                 household_role__in=['primary_caregiver', 'caregiver']
             )
         return User.objects.none()
+
+
+class Waitlist(models.Model):
+    """
+    Waitlist for controlling access during beta/early access.
+
+    To enable/disable: Set WAITLIST_ENABLED in settings.py
+    To remove entirely later: Delete this model, remove from admin.py, and remove waitlist checks in views.py
+    """
+    email = models.EmailField(unique=True, db_index=True)
+    added_at = models.DateTimeField(auto_now_add=True)
+    added_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='waitlist_entries'
+    )
+    notes = models.TextField(blank=True, help_text='Optional notes about this waitlist entry')
+    is_active = models.BooleanField(default=True, help_text='Set to False to revoke access')
+
+    class Meta:
+        ordering = ['-added_at']
+        verbose_name = 'Waitlist Entry'
+        verbose_name_plural = 'Waitlist Entries'
+
+    def __str__(self):
+        return f"{self.email} ({'active' if self.is_active else 'inactive'})"
+
+    @classmethod
+    def is_email_allowed(cls, email):
+        """Check if an email is on the waitlist"""
+        from django.conf import settings
+
+        # If waitlist is disabled in settings, allow all emails
+        if not getattr(settings, 'WAITLIST_ENABLED', True):
+            return True
+
+        try:
+            return cls.objects.filter(
+                email__iexact=email.lower(),
+                is_active=True
+            ).exists()
+        except Exception:
+            return False

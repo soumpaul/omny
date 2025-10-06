@@ -37,6 +37,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+# For REST API, we use token authentication (not session cookies)
+# so CSRF protection is not needed for API endpoints
+CORS_ALLOW_CREDENTIALS = False
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -54,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,7 +66,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'omny_be.urls'
@@ -207,27 +211,27 @@ SPECTACULAR_SETTINGS = {
 }
 
 # Firebase Configuration
-# Set your Firebase credentials path as an environment variable
-# export FIREBASE_CREDENTIALS_PATH="/path/to/serviceAccountKey.json"
 import os
 
-FIREBASE_CREDENTIALS_PATH = os.environ.get('FIREBASE_CREDENTIALS_PATH', '')
+FIREBASE_CREDENTIALS_PATH = BASE_DIR / 'serviceAccountKey.json'
 
 # Initialize Firebase Admin SDK
-if FIREBASE_CREDENTIALS_PATH and os.path.exists(FIREBASE_CREDENTIALS_PATH):
+if os.path.exists(FIREBASE_CREDENTIALS_PATH):
     import firebase_admin
     from firebase_admin import credentials
-    
+
     if not firebase_admin._apps:
-        cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+        cred = credentials.Certificate(str(FIREBASE_CREDENTIALS_PATH))
         firebase_admin.initialize_app(cred)
 else:
-    # For development, you can also initialize without credentials
-    # This will use Application Default Credentials
     import firebase_admin
     if not firebase_admin._apps:
         try:
             firebase_admin.initialize_app()
         except Exception as e:
             print(f"Warning: Firebase initialization failed: {e}")
-            print("Please set FIREBASE_CREDENTIALS_PATH environment variable")
+            print(f"Please ensure serviceAccountKey.json exists at {FIREBASE_CREDENTIALS_PATH}")
+
+
+# Waitlist Settings - Set to False to disable waitlist
+WAITLIST_ENABLED = True

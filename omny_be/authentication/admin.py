@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Household
+from .models import User, Household, Waitlist
 
 
 @admin.register(Household)
@@ -76,3 +76,20 @@ class UserAdmin(BaseUserAdmin):
     
     ordering = ('-date_joined',)
     filter_horizontal = ('groups', 'user_permissions')
+
+
+@admin.register(Waitlist)
+class WaitlistAdmin(admin.ModelAdmin):
+    list_display = ('email', 'is_active', 'added_at', 'added_by')
+    list_filter = ('is_active', 'added_at')
+    search_fields = ('email', 'notes')
+    readonly_fields = ('added_at',)
+
+    fieldsets = (
+        ('Waitlist Entry', {
+            'fields': ('email', 'is_active')
+        }),
+        ('Details', {
+            'fields': ('added_by', 'notes', 'added_at')
+        }),
+    )

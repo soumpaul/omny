@@ -1,0 +1,222 @@
+# Python Backend (Django) - omny_be/
+# Byte-compiled / optimized / DLL files
+omny_be/__pycache__/
+omny_be/**/__pycache__/
+omny_be/**/*.py[cod]
+omny_be/**/*$py.class
+
+# C extensions
+*.so
+
+# virtual env
+.venv
+
+# Environment
+.env
+
+# firebase
+serviceAccountKey.json
+
+# Distribution / packaging
+omny_be/.Python
+omny_be/build/
+omny_be/develop-eggs/
+omny_be/dist/
+omny_be/downloads/
+omny_be/eggs/
+omny_be/.eggs/
+omny_be/lib/
+omny_be/lib64/
+omny_be/parts/
+omny_be/sdist/
+omny_be/var/
+omny_be/wheels/
+omny_be/pip-wheel-metadata/
+omny_be/share/python-wheels/
+omny_be/*.egg-info/
+omny_be/.installed.cfg
+omny_be/*.egg
+omny_be/MANIFEST
+
+# Django stuff
+omny_be/*.log
+omny_be/local_settings.py
+omny_be/db.sqlite3
+omny_be/db.sqlite3-journal
+omny_be/media/
+omny_be/staticfiles/
+
+# Unit test / coverage reports
+omny_be/htmlcov/
+omny_be/.tox/
+omny_be/.nox/
+omny_be/.coverage
+omny_be/.coverage.*
+omny_be/.cache
+omny_be/nosetests.xml
+omny_be/coverage.xml
+omny_be/*.cover
+omny_be/*.py,cover
+omny_be/.hypothesis/
+omny_be/.pytest_cache/
+
+# Translations
+omny_be/*.mo
+omny_be/*.pot
+
+# Sphinx documentation
+omny_be/docs/_build/
+
+# PyBuilder
+omny_be/target/
+
+# Jupyter Notebook
+omny_be/.ipynb_checkpoints
+
+# IPython
+omny_be/profile_default/
+omny_be/ipython_config.py
+
+# pyenv
+omny_be/.python-version
+
+# pipenv
+omny_be/Pipfile.lock
+
+# PEP 582
+omny_be/__pypackages__/
+
+# Celery stuff
+omny_be/celerybeat-schedule
+omny_be/celerybeat.pid
+
+# SageMath parsed files
+omny_be/*.sage.py
+
+# Environments
+omny_be/.env
+omny_be/.venv
+omny_be/env/
+omny_be/venv/
+omny_be/ENV/
+omny_be/env.bak/
+omny_be/venv.bak/
+
+# mypy
+omny_be/.mypy_cache/
+omny_be/.dmypy.json
+omny_be/dmypy.json
+
+# Pyre type checker
+omny_be/.pyre/
+
+# Flutter App - omny_app/
+# Miscellaneous
+omny_app/*.class
+omny_app/.DS_Store
+omny_app/.atom/
+omny_app/.build/
+omny_app/.buildlog/
+omny_app/.history
+omny_app/.svn/
+omny_app/.swiftpm/
+omny_app/migrate_working_dir/
+
+# IntelliJ related
+omny_app/*.iml
+omny_app/*.ipr
+omny_app/*.iws
+omny_app/.idea/
+
+# VS Code
+omny_app/.vscode/
+
+# Flutter/Dart/Pub related
+omny_app/**/doc/api/
+omny_app/**/ios/Flutter/.last_build_id
+omny_app/.dart_tool/
+omny_app/.flutter-plugins
+omny_app/.flutter-plugins-dependencies
+omny_app/.packages
+omny_app/.pub-cache/
+omny_app/.pub/
+omny_app/build/
+omny_app/coverage/
+omny_app/pubspec.lock
+
+# Symbolication related
+omny_app/app.*.symbols
+
+# Obfuscation related
+omny_app/app.*.map.json
+
+# Android Studio will place build artifacts here
+omny_app/android/app/debug
+omny_app/android/app/profile
+omny_app/android/app/release
+omny_app/android/.gradle
+omny_app/android/captures/
+omny_app/android/gradle-wrapper.jar
+omny_app/android/.gradle/
+omny_app/android/local.properties
+
+# iOS
+omny_app/ios/Pods/
+omny_app/ios/.symlinks/
+omny_app/ios/Flutter/Flutter.framework
+omny_app/ios/Flutter/Flutter.podspec
+omny_app/ios/Flutter/Generated.xcconfig
+omny_app/ios/Flutter/ephemeral/
+omny_app/ios/Flutter/app.flx
+omny_app/ios/Flutter/app.zip
+omny_app/ios/Flutter/flutter_assets/
+omny_app/ios/Flutter/flutter_export_environment.sh
+omny_app/ios/ServiceDefinitions.json
+omny_app/ios/Runner/GeneratedPluginRegistrant.*
+omny_app/ios/*.pbxuser
+omny_app/ios/*.mode1v3
+omny_app/ios/*.mode2v3
+omny_app/ios/*.perspectivev3
+omny_app/ios/xcuserdata/
+omny_app/ios/*.moved-aside
+omny_app/ios/*.hmap
+omny_app/ios/*.ipa
+omny_app/ios/*.xcuserstate
+omny_app/ios/project.xcworkspace/
+
+# macOS
+omny_app/macos/Flutter/ephemeral/
+omny_app/macos/Flutter/Flutter-Debug.xcconfig
+omny_app/macos/Flutter/Flutter-Release.xcconfig
+omny_app/macos/Flutter/Flutter-Profile.xcconfig
+
+# Web
+omny_app/web/flutter_service_worker.js
+omny_app/web/flutter_service_worker.js.map
+
+# Firebase - IMPORTANT: Keep firebase_options.dart in version control
+# It's auto-generated but needed for the project
+# DO NOT ignore: firebase_options.dart
+
+# Environment files
+omny_app/.env
+omny_app/.env.local
+omny_app/.env.*.local
+
+# Generated files
+omny_app/**/*.g.dart
+omny_app/**/*.freezed.dart
+omny_app/**/*.mocks.dart
+
+# Test related
+omny_app/.test_coverage/
+omny_app/test/.test_coverage.dart
+
+# Root level
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.env

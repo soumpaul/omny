@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.conf import settings
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 import firebase_admin
@@ -12,6 +13,9 @@ import os
 import json
 
 User = get_user_model()
+
+# Import Waitlist model - can be easily removed later
+from .models import Waitlist
 
 
 class FirebaseAuthView(APIView):
@@ -96,13 +100,13 @@ class RegisterView(FirebaseAuthView):
     )
     def post(self, request):
         id_token = request.data.get('id_token')
-        
+
         if not id_token:
             return Response(
                 {'error': 'Firebase ID token is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Verify Firebase token
         decoded_token, error = self.verify_firebase_token(id_token)
         if error:
@@ -110,9 +114,20 @@ class RegisterView(FirebaseAuthView):
                 {'error': error},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
+
         firebase_uid = decoded_token.get('uid')
         email = decoded_token.get('email')
+
+        # WAITLIST CHECK - Remove this block later to disable waitlist
+        if not Waitlist.is_email_allowed(email):
+            return Response(
+                {
+                    'error': 'waitlist_required',
+                    'message': 'You are not currently on our waitlist. Please contact us for access.',
+                    'email': email
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         if not email:
             return Response(
@@ -120,19 +135,53 @@ class RegisterView(FirebaseAuthView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check if user already exists
-        if User.objects.filter(firebase_uid=firebase_uid).exists():
-            return Response(
-                {'error': 'User already exists'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+        # Check if user already exists - if so, treat as login
+        try:
+            user = User.objects.get(firebase_uid=firebase_uid)
+
+            # Update last login
+            from django.utils import timezone
+            user.last_login = timezone.now()
+            user.save(update_fields=['last_login'])
+
+            return Response({
+                'message': 'User registered successfully',
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'firebase_uid': user.firebase_uid,
+                    'display_name': user.display_name,
+                    'phone_number': user.phone_number,
+                    'household_role': user.household_role,
+                    'household_id': user.household_id,
+                }
+            }, status=status.HTTP_201_CREATED)
+
+        except User.DoesNotExist:
+            pass
+
+        # Check if email already registered with different firebase_uid
         if User.objects.filter(email=email).exists():
-            return Response(
-                {'error': 'Email already registered'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            existing_user = User.objects.get(email=email)
+
+            # Update last login
+            from django.utils import timezone
+            existing_user.last_login = timezone.now()
+            existing_user.save(update_fields=['last_login'])
+
+            return Response({
+                'message': 'User registered successfully',
+                'user': {
+                    'id': existing_user.id,
+                    'email': existing_user.email,
+                    'firebase_uid': existing_user.firebase_uid,
+                    'display_name': existing_user.display_name,
+                    'phone_number': existing_user.phone_number,
+                    'household_role': existing_user.household_role,
+                    'household_id': existing_user.household_id,
+                }
+            }, status=status.HTTP_201_CREATED)
+
         # Create new user
         try:
             with transaction.atomic():
@@ -144,7 +193,7 @@ class RegisterView(FirebaseAuthView):
                     profile_picture=decoded_token.get('picture', ''),
                     household_role=request.data.get('household_role', 'caregiver'),
                 )
-                
+
                 return Response({
                     'message': 'User registered successfully',
                     'user': {
@@ -157,7 +206,7 @@ class RegisterView(FirebaseAuthView):
                         'household_id': user.household_id,
                     }
                 }, status=status.HTTP_201_CREATED)
-                
+
         except Exception as e:
             return Response(
                 {'error': f'Failed to create user: {str(e)}'},
@@ -212,13 +261,13 @@ class LoginView(FirebaseAuthView):
     )
     def post(self, request):
         id_token = request.data.get('id_token')
-        
+
         if not id_token:
             return Response(
                 {'error': 'Firebase ID token is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Verify Firebase token
         decoded_token, error = self.verify_firebase_token(id_token)
         if error:
@@ -226,8 +275,20 @@ class LoginView(FirebaseAuthView):
                 {'error': error},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
+
         firebase_uid = decoded_token.get('uid')
+        email = decoded_token.get('email')
+
+        # WAITLIST CHECK - Remove this block later to disable waitlist
+        if not Waitlist.is_email_allowed(email):
+            return Response(
+                {
+                    'error': 'waitlist_required',
+                    'message': 'You are not currently on our waitlist. Please contact us for access.',
+                    'email': email
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         # Get or create user
         try:

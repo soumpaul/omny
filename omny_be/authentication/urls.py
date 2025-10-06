@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 from .views import (
     RegisterView,
     LoginView,
@@ -10,9 +11,9 @@ from .views import (
 app_name = 'authentication'
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('verify/', VerifyTokenView.as_view(), name='verify'),
-    path('profile/', UserProfileView.as_view(), name='profile'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('register/', csrf_exempt(RegisterView.as_view()), name='register'),
+    path('login/', csrf_exempt(LoginView.as_view()), name='login'),
+    path('verify-token/', csrf_exempt(VerifyTokenView.as_view()), name='verify'),
+    path('profile/', csrf_exempt(UserProfileView.as_view()), name='profile'),
+    path('logout/', csrf_exempt(LogoutView.as_view()), name='logout'),
 ]
